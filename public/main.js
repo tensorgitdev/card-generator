@@ -1,3 +1,15 @@
+// 비밀번호 체크
+;(function () {
+  const PASS = '0000'
+  if (sessionStorage.getItem('authed') === PASS) return
+  const input = prompt('비밀번호를 입력하세요')
+  if (input !== PASS) {
+    document.body.innerHTML = '<p style="text-align:center;margin-top:40vh;font-size:1.2rem">❌ 접근 불가</p>'
+    throw new Error('Unauthorized')
+  }
+  sessionStorage.setItem('authed', PASS)
+})()
+
 const { createClient } = supabase
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 

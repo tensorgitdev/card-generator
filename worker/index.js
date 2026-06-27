@@ -2,56 +2,14 @@
 const SUPABASE_URL = 'https://mqruxlhrxniyzbhkhmtc.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xcnV4bGhyeG5peXpiaGtobXRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMjgzMDIsImV4cCI6MjA4MzkwNDMwMn0.qPt-dN4Uj0d0pKU11AYy782XMuoXeJ7CFiVXmEyrJzA'
 
-const ADMIN_PASS = '0000'
-const COOKIE_NAME = 'admin_auth'
-
-function isAuthed(request) {
-  const cookie = request.headers.get('Cookie') || ''
-  return cookie.split(';').some(c => c.trim() === `${COOKIE_NAME}=${ADMIN_PASS}`)
-}
-
-function loginPage(msg = '') {
-  return new Response(`<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><title>Login</title>
-<style>body{display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:sans-serif;background:#f5f5f5}
-form{background:#fff;padding:2rem;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.1);display:flex;flex-direction:column;gap:1rem;min-width:280px}
-input{padding:.6rem;border:1px solid #ccc;border-radius:4px;font-size:1rem}
-button{padding:.6rem;background:#333;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:1rem}
-.err{color:red;font-size:.9rem}</style></head>
-<body><form method="POST" action="/__login">
-<h2 style="margin:0">관리자</h2>
-${msg ? `<p class="err">${msg}</p>` : ''}
-<input type="password" name="pass" placeholder="비밀번호" autofocus />
-<button type="submit">로그인</button>
-</form></body></html>`, { headers: { 'Content-Type': 'text/html;charset=UTF-8' } })
-}
-
 export default {
   async fetch(request, env) {
     const url = new URL(request.url)
     const pathname = url.pathname
 
-    // 로그인 처리
-    if (pathname === '/__login' && request.method === 'POST') {
-      const body = await request.formData()
-      const pass = body.get('pass')
-      if (pass === ADMIN_PASS) {
-        return new Response(null, {
-          status: 302,
-          headers: {
-            Location: '/',
-            'Set-Cookie': `${COOKIE_NAME}=${ADMIN_PASS}; Path=/; HttpOnly; SameSite=Strict`
-          }
-        })
-      }
-      return loginPage('비밀번호가 틀렸습니다.')
-    }
-
     // /card/:id 라우트 처리
     const match = pathname.match(/^\/card\/([a-zA-Z0-9-]+)$/)
     if (!match) {
-      // 관리자 페이지는 로그인 필요
-      if (!isAuthed(request)) return loginPage()
       return env.ASSETS.fetch(request)
     }
 
