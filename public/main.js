@@ -2,12 +2,55 @@
 ;(function () {
   const PASS = '0000'
   if (sessionStorage.getItem('authed') === PASS) return
-  const input = prompt('비밀번호를 입력하세요')
-  if (input !== PASS) {
-    document.body.innerHTML = '<p style="text-align:center;margin-top:40vh;font-size:1.2rem">❌ 접근 불가</p>'
-    throw new Error('Unauthorized')
+
+  // 오버레이로 내용 가리기
+  const overlay = document.createElement('div')
+  overlay.id = 'login-overlay'
+  overlay.innerHTML = `
+    <div id="login-box">
+      <h2>관리자</h2>
+      <input type="password" id="login-input" placeholder="비밀번호" />
+      <p id="login-error"></p>
+      <button id="login-btn">확인</button>
+    </div>
+  `
+  Object.assign(overlay.style, {
+    position: 'fixed', inset: '0', background: '#f5f5f5',
+    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: '9999'
+  })
+  document.body.style.visibility = 'hidden'
+  document.body.appendChild(overlay)
+  overlay.style.visibility = 'visible'
+
+  const style = document.createElement('style')
+  style.textContent = `
+    #login-box { background:#fff; padding:2rem; border-radius:10px;
+      box-shadow:0 4px 16px rgba(0,0,0,.12); display:flex; flex-direction:column; gap:.8rem; min-width:260px; }
+    #login-box h2 { margin:0; font-size:1.2rem; }
+    #login-input { padding:.6rem; border:1px solid #ccc; border-radius:6px; font-size:1rem; }
+    #login-btn { padding:.6rem; background:#222; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:1rem; }
+    #login-error { color:red; font-size:.85rem; margin:0; min-height:1rem; }
+  `
+  document.head.appendChild(style)
+
+  function tryLogin() {
+    const val = document.getElementById('login-input').value
+    if (val === PASS) {
+      sessionStorage.setItem('authed', PASS)
+      overlay.remove()
+      document.body.style.visibility = 'visible'
+    } else {
+      document.getElementById('login-error').textContent = '비밀번호가 틀렸습니다.'
+      document.getElementById('login-input').value = ''
+      document.getElementById('login-input').focus()
+    }
   }
-  sessionStorage.setItem('authed', PASS)
+
+  document.getElementById('login-btn').addEventListener('click', tryLogin)
+  document.getElementById('login-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') tryLogin()
+  })
+  document.getElementById('login-input').focus()
 })()
 
 const { createClient } = supabase
