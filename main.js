@@ -37,7 +37,7 @@ $('#submitBtn').on('click', async function () {
     // 2. DB에 카드 메타데이터 저장
     const { data, error: insertError } = await sb
       .from('card')
-      .insert({ image_url: publicUrl, bsky_url: bskyUrl })
+      .insert({ img_url: publicUrl, bsky_url: bskyUrl })
       .select()
       .single()
 
@@ -77,11 +77,11 @@ async function loadCards () {
     const workerUrl = `${WORKER_URL}/card/${card.id}`
     return `
       <div class="card-item" data-id="${card.id}">
-        <img src="${card.image_url}" alt="card" />
+        <img src="${card.img_url}" alt="card" />
         <div class="card-meta">
           <span class="card-url" title="${workerUrl}">${workerUrl}</span>
           <button class="copy-btn" data-url="${workerUrl}">복사</button>
-          <button class="delete-btn" data-id="${card.id}" data-img="${card.image_url}">삭제</button>
+          <button class="delete-btn" data-id="${card.id}" data-img="${card.img_url}">삭제</button>
         </div>
       </div>
     `
