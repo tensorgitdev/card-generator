@@ -1,8 +1,0 @@
-name = "card-generator"
-main = "index.js"
-compatibility_date = "2024-01-01"
-workers_dev = true
-
-# 환경변수는 wrangler secret으로 설정하세요:
-# wrangler secret put SUPABASE_URL
-# wrangler secret put SUPABASE_ANON_KEY
