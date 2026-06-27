@@ -59,10 +59,14 @@ function buildOgHtml(card) {
   <meta charset="UTF-8" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="${card.bsky_url}" />
+  <meta property="og:title" content="Click to view on Bluesky" />
+  <meta property="og:description" content="${card.bsky_url}" />
   <meta property="og:image" content="${card.img_url}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Click to view on Bluesky" />
+  <meta name="twitter:description" content="${card.bsky_url}" />
   <meta name="twitter:image" content="${card.img_url}" />
   <meta http-equiv="refresh" content="0;url=${card.bsky_url}" />
 </head>
