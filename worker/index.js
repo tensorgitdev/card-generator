@@ -2,14 +2,55 @@
 const SUPABASE_URL = 'https://mqruxlhrxniyzbhkhmtc.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xcnV4bGhyeG5peXpiaGtobXRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMjgzMDIsImV4cCI6MjA4MzkwNDMwMn0.qPt-dN4Uj0d0pKU11AYy782XMuoXeJ7CFiVXmEyrJzA'
 
+const ADMIN_PASS = '0000'
+const COOKIE = 'admin_tok'
+
+function isAuthed(request) {
+  const cookie = request.headers.get('Cookie') || ''
+  return cookie.split(';').some(c => c.trim() === `${COOKIE}=${ADMIN_PASS}`)
+}
+
+function loginPage(err = false) {
+  return new Response(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Login</title>
+<style>*{box-sizing:border-box}body{margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f5f5f5;font-family:sans-serif}
+.box{background:#fff;padding:2rem;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.1);display:flex;flex-direction:column;gap:.8rem;min-width:260px}
+h2{margin:0;font-size:1.2rem}input{padding:.6rem;border:1px solid #ccc;border-radius:6px;font-size:1rem}
+button{padding:.6rem;background:#222;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:1rem}
+.err{color:red;font-size:.85rem;margin:0}</style></head>
+<body><div class="box"><h2>관리자</h2>
+${err ? '<p class="err">비밀번호가 틀렸습니다.</p>' : ''}
+<form method="POST" action="/__login">
+<input type="password" name="pass" placeholder="비밀번호" autofocus />
+<button type="submit">확인</button>
+</form></div></body></html>`, {
+    headers: { 'Content-Type': 'text/html;charset=UTF-8' }
+  })
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url)
     const pathname = url.pathname
 
+    // 로그인 처리
+    if (pathname === '/__login' && request.method === 'POST') {
+      const form = await request.formData()
+      if (form.get('pass') === ADMIN_PASS) {
+        return new Response(null, {
+          status: 302,
+          headers: {
+            Location: '/',
+            'Set-Cookie': `${COOKIE}=${ADMIN_PASS}; Path=/; HttpOnly; SameSite=Strict`
+          }
+        })
+      }
+      return loginPage(true)
+    }
+
     // /card/:id 라우트 처리
     const match = pathname.match(/^\/card\/([a-zA-Z0-9-]+)$/)
     if (!match) {
+      if (!isAuthed(request)) return loginPage()
       return env.ASSETS.fetch(request)
     }
 
