@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Card Generator</title>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Card Generator</h1>
+
+    <section class="form-section">
+      <h2>새 카드 추가</h2>
+      <div class="form-group">
+        <label>카드 이미지</label>
+        <input type="file" id="imageInput" accept="image/*" />
+        <div id="preview" class="preview-box"></div>
+      </div>
+      <div class="form-group">
+        <label>Bluesky URL</label>
+        <input type="text" id="bskyUrl" placeholder="https://bsky.app/profile/..." />
+      </div>
+      <button id="submitBtn">카드 생성</button>
+      <p id="statusMsg" class="status"></p>
+    </section>
+
+    <section class="cards-section">
+      <h2>카드 목록</h2>
+      <div id="cardList" class="card-grid"></div>
+    </section>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
