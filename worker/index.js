@@ -1,26 +1,28 @@
 // Cloudflare Worker - Card OG 서버
-// 환경변수 설정 필요: SUPABASE_URL, SUPABASE_ANON_KEY
+const SUPABASE_URL = 'https://mqruxlhrxniyzbhkhmtc.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xcnV4bGhyeG5peXpiaGtobXRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMjgzMDIsImV4cCI6MjA4MzkwNDMwMn0.qPt-dN4Uj0d0pKU11AYy782XMuoXeJ7CFiVXmEyrJzA'
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url)
     const pathname = url.pathname
 
-    // /card/:id 라우트만 처리
+    // /card/:id 라우트 처리
     const match = pathname.match(/^\/card\/([a-zA-Z0-9-]+)$/)
     if (!match) {
-      return new Response('Not Found', { status: 404 })
+      // 나머지는 정적 파일 서빙
+      return env.ASSETS.fetch(request)
     }
 
     const cardId = match[1]
 
     // Supabase에서 카드 조회
     const res = await fetch(
-      `${env.SUPABASE_URL}/rest/v1/card?id=eq.${cardId}&select=*`,
+      `${SUPABASE_URL}/rest/v1/card?id=eq.${cardId}&select=*`,
       {
         headers: {
-          apikey: env.SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${env.SUPABASE_ANON_KEY}`,
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
         },
       }
     )
