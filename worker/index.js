@@ -2,6 +2,21 @@
 const SUPABASE_URL = 'https://mqruxlhrxniyzbhkhmtc.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xcnV4bGhyeG5peXpiaGtobXRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMjgzMDIsImV4cCI6MjA4MzkwNDMwMn0.qPt-dN4Uj0d0pKU11AYy782XMuoXeJ7CFiVXmEyrJzA'
 
+const ADMIN_USER = 'admin'
+const ADMIN_PASS = '0000'
+
+function basicAuth(request) {
+  const auth = request.headers.get('Authorization') || ''
+  if (!auth.startsWith('Basic ')) return false
+  const [user, pass] = atob(auth.slice(6)).split(':')
+  return user === ADMIN_USER && pass === ADMIN_PASS
+}
+
+const authFail = () => new Response('Unauthorized', {
+  status: 401,
+  headers: { 'WWW-Authenticate': 'Basic realm="Admin"' }
+})
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url)
@@ -10,7 +25,8 @@ export default {
     // /card/:id 라우트 처리
     const match = pathname.match(/^\/card\/([a-zA-Z0-9-]+)$/)
     if (!match) {
-      // 나머지는 정적 파일 서빙
+      // 관리자 페이지는 Basic Auth
+      if (!basicAuth(request)) return authFail()
       return env.ASSETS.fetch(request)
     }
 
